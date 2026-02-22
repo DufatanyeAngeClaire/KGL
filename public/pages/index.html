@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>KGL Login</title>
+
+       <!-- Local Bootstrap CSS -->
+        <link rel="stylesheet" href="/public/css/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/public/css/bootstrap-icons/bootstrap-icons.css">
+ 
+
+    <!-- Custom CSS -->
+       <link rel="stylesheet" href="/public/css/style.css">
+</head>
+<body class="bg-light">
+
+<!-- TOAST CONTAINER -->
+<div class="kgl-toast" id="toastContainer"></div>
+
+<!-- LOGIN CONTAINER -->
+<div class="container vh-100 d-flex justify-content-center align-items-center">
+    <div class="col-md-4">
+
+        <div class="card shadow border-0">
+            <div class="card-header bg-success text-white text-center">
+                <h5 class="mb-0">Karibu Groceries LTD</h5>
+            </div>
+
+            <div class="card-body">
+                <h6 class="text-center text-muted mb-3">Login</h6>
+
+                <form id="loginForm">
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" id="email" class="form-control" placeholder="Enter email">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input type="password" id="password" class="form-control" placeholder="Enter password">
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100">
+                        Login
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <p class="text-center text-muted mt-3">
+            &copy; 2026 Karibu Groceries LTD
+        </p>
+
+    </div>
+</div>
+
+<!-- JS -->
+<script>
+/* ============================
+   TOAST FUNCTION
+============================ */
+function showToast(message, type = "success") {
+    const container = document.getElementById("toastContainer");
+    const toast = document.createElement("div");
+    toast.className = `kgl-toast kgl-toast-${type}`;
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+
+/* ============================
+   LOGIN HANDLER (BACKEND)
+============================ */
+document.getElementById("loginForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
+
+    if (!email || !password) {
+        showToast("Please enter both email and password.", "error");
+        return;
+    }
+
+    try {
+        const res = await fetch("http://localhost:5000/api/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            showToast(data.message || "Login failed", "error");
+            return;
+        }
+
+        // Save token & session
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("currentSession", JSON.stringify({
+            username: data.fullName,
+            role: data.role,
+            branch: data.branch
+        }));
+
+        showToast("Login successful!", "success");
+
+        // Redirect based on role
+        setTimeout(() => {
+            if (data.role === "director") window.location.href = "manager.html";
+            else window.location.href = "manager.html"; // or sales page
+        }, 1000);
+
+    } catch (err) {
+        console.error(err);
+        showToast("Server error. Try again later.", "error");
+    }
+});
+</script>
+
+<script src="/public/css/bootstrap/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

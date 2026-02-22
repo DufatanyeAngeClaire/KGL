@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Director Dashboard - KGL</title>
+    <!-- Local Bootstrap CSS -->
+    <link rel="stylesheet" href="/public/css/bootstrap/css/bootstrap.min.css" />
+    <link
+      rel="stylesheet"
+      href="/public/css/bootstrap-icons/bootstrap-icons.css"
+    />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/public/css/style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+      body {
+        overflow-x: hidden;
+      }
+      .sidebar {
+        width: 230px;
+        height: 100vh;
+        position: fixed;
+        background-color: #198754;
+        padding-top: 20px;
+      }
+      .sidebar a {
+        display: block;
+        padding: 10px 20px;
+        color: #fff;
+        text-decoration: none;
+      }
+      .sidebar a:hover,
+      .sidebar a.active {
+        background-color: rgba(255, 255, 255, 0.2);
+      }
+      .main-content {
+        margin-left: 230px;
+        padding: 30px;
+      }
+    </style>
+  </head>
+  <body class="bg-light">
+    <div class="sidebar">
+      <div class="text-center mb-4">
+        <img
+          src="/assets/image/karibu logo.jpg"
+          width="60"
+          class="rounded-circle shadow"
+        />
+        <h6 class="text-white mt-2">KGL System</h6>
+      </div>
+      <a href="director.html" class="active"
+        ><i class="bi bi-speedometer2 me-2"></i>Dashboard</a
+      >
+      <a href="#" id="logoutBtn" class="mt-auto text-danger">
+        <i class="bi bi-box-arrow-right me-2"></i>Logout
+      </a>
+    </div>
+
+    <div class="main-content">
+      <h3 class="fw-bold text-success">Director Dashboard</h3>
+      <p class="text-muted mb-4">Aggregated Overview Across All Branches</p>
+
+      <!-- SUMMARY CARDS -->
+      <div class="row g-4 mb-5">
+        <div class="col-md-4">
+          <div class="card shadow text-center">
+            <div class="card-body">
+              <i class="bi bi-box-seam fs-1 text-success"></i>
+              <h6 class="text-muted mt-2">Total Stock</h6>
+              <h4 class="fw-bold text-success" id="totalStock">0 KG</h4>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card shadow text-center">
+            <div class="card-body">
+              <i class="bi bi-currency-dollar fs-1 text-success"></i>
+              <h6 class="text-muted mt-2">Total Sales</h6>
+              <h4 class="fw-bold text-success" id="totalSales">UGX 0</h4>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card shadow text-center">
+            <div class="card-body">
+              <i class="bi bi-wallet2 fs-1 text-danger"></i>
+              <h6 class="text-muted mt-2">Credit Outstanding</h6>
+              <h4 class="fw-bold text-danger" id="totalCredit">UGX 0</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHARTS -->
+      <div class="row g-4">
+        <div class="col-md-6">
+          <div class="card shadow p-3">
+            <h6 class="fw-bold mb-3">Stock by Branch</h6>
+            <canvas id="stockChart"></canvas>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card shadow p-3">
+            <h6 class="fw-bold mb-3">Sales vs Credit by Branch</h6>
+            <canvas id="salesCreditChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const token = localStorage.getItem("token");
+      const session = JSON.parse(localStorage.getItem("currentSession"));
+
+      if (!session || session.role !== "director" || !token) {
+        window.location.href = "index.html";
+      }
+
+      document.getElementById("logoutBtn").addEventListener("click", () => {
+        localStorage.removeItem("currentSession");
+        localStorage.removeItem("token");
+        window.location.href = "index.html";
+      });
+
+      async function loadDirectorDashboard() {
+        try {
+          const res = await fetch(
+            "http://localhost:5000/api/director/aggregates",
+            {
+              headers: { Authorization: "Bearer " + token },
+            },
+          );
+          const data = await res.json();
+
+          // Summary Cards
+          const totalStock = data.stockData.reduce(
+            (sum, b) => sum + b.totalStock,
+            0,
+          );
+          const totalSales = data.salesData.reduce(
+            (sum, b) => sum + b.totalSales,
+            0,
+          );
+          const totalCredit = data.creditData.reduce(
+            (sum, b) => sum + b.totalCredit,
+            0,
+          );
+
+          document.getElementById("totalStock").textContent =
+            totalStock + " KG";
+          document.getElementById("totalSales").textContent =
+            "UGX " + totalSales.toLocaleString();
+          document.getElementById("totalCredit").textContent =
+            "UGX " + totalCredit.toLocaleString();
+
+          // Stock Chart
+          const stockCtx = document
+            .getElementById("stockChart")
+            .getContext("2d");
+          new Chart(stockCtx, {
+            type: "bar",
+            data: {
+              labels: data.stockData.map((b) => b._id),
+              datasets: [
+                {
+                  label: "Stock (KG)",
+                  data: data.stockData.map((b) => b.totalStock),
+                  backgroundColor: "#198754",
+                },
+              ],
+            },
+          });
+
+          // Sales vs Credit Chart
+          const salesCreditCtx = document
+            .getElementById("salesCreditChart")
+            .getContext("2d");
+          new Chart(salesCreditCtx, {
+            type: "bar",
+            data: {
+              labels: data.salesData.map((b) => b._id),
+              datasets: [
+                {
+                  label: "Sales (UGX)",
+                  data: data.salesData.map((b) => b.totalSales),
+                  backgroundColor: "#198754",
+                },
+                {
+                  label: "Credit Outstanding (UGX)",
+                  data: data.creditData.map((b) => b.totalCredit),
+                  backgroundColor: "#dc3545",
+                },
+              ],
+            },
+            options: { responsive: true, scales: { y: { beginAtZero: true } } },
+          });
+        } catch (err) {
+          console.error("Error loading director dashboard:", err);
+        }
+      }
+
+      loadDirectorDashboard();
+    </script>
+
+    <script src="/public/css/bootstrap/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

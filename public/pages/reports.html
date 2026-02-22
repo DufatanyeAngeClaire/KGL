@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sales Reports | KGL</title>
+
+     <!-- Local Bootstrap CSS -->
+        <link rel="stylesheet" href="/public/css/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/public/css/bootstrap-icons/bootstrap-icons.css">
+ 
+
+    <!-- Custom CSS -->
+       <link rel="stylesheet" href="/public/css/style.css">
+</head>
+<body class="bg-light">
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-success">
+    <div class="container-fluid">
+        <span class="navbar-brand fw-bold">Karibu Groceries LTD</span>
+        <a href="manager.html" class="btn btn-outline-light btn-sm">Dashboard</a>
+    </div>
+</nav>
+
+<!-- PAGE TITLE -->
+<div class="container mt-4">
+    <div class="row">
+        <div class="col text-center">
+            <h3 class="fw-bold text-success">Director Reports</h3>
+            <p class="text-muted">Sales totals across all branches</p>
+        </div>
+    </div>
+</div>
+
+<!-- REPORT TABLE -->
+<div class="container mt-4 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+
+            <div class="card shadow border-0">
+                <div class="card-header bg-success text-white">
+                    Sales Summary (Totals Only)
+                </div>
+
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped align-middle">
+                            <thead class="table-success">
+                                <tr>
+                                    <th>Branch</th>
+                                    <th>Total Sales (UGX)</th>
+                                    <th>Total Tonnage Sold (KG)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Maganjo</td>
+                                    <td>25,000,000</td>
+                                    <td>12,000</td>
+                                </tr>
+                                <tr>
+                                    <td>Matugga</td>
+                                    <td>18,000,000</td>
+                                    <td>9,500</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- TOTAL ROW -->
+                    <div class="text-end mt-3">
+                        <strong class="text-success">
+                            Grand Total: UGX 43,000,000
+                        </strong>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="text-center text-muted mb-3">
+    &copy; 2026 Karibu Groceries LTD
+</footer>
+
+<!-- BOOTSTRAP JS -->
+<script src="css/bootstrap/js/bootstr
