@@ -15,6 +15,7 @@ app.use("/api/produce", require("./routes/produceRoutes"));
 app.use("/api/sales", require("./routes/salesRoutes"));
 app.use("/api/credit-sales", require("./routes/creditSalesRoutes"));
 app.use("/api/director", require("./routes/directorRoutes"));
+app.use("/api/dashboard", require("./routes/dashboard"))
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)

@@ -31,12 +31,13 @@ exports.register = async (req, res) => {
   }
 };
 
-// LOGIN
+// login
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: email }); 
+
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
@@ -50,20 +51,24 @@ exports.login = async (req, res) => {
       {
         id: user._id,
         role: user.role,
-        fullName: user.fullName, 
+        fullName: user.fullName,
+        email:user.email,
         branch: user.branch,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "1d" },
+      { expiresIn: "1d" }
     );
 
-    res.json({
-      token,
-      role: user.role,
-      fullName: user.fullName,
-      branch: user.branch,
-    });
+  res.json({
+  token,
+  role: user.role,
+  email: user.email,
+  fullname: user.fullName,
+  branch: user.branch
+});
+
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
+  
 };

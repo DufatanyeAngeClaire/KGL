@@ -3,9 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+"scripts": {
+  "server": "nodemon server.js",
+  "client": "npm run dev --prefix kgl-frontend",
+  "dev": "concurrently \"npm run server\" \"npm run client\""
+},
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -17,5 +19,9 @@
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.2.1"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "nodemon": "^3.1.14"
   }
 }
